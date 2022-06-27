@@ -2,81 +2,62 @@ import React from "react";
 import Employee from "./Employee";
 import "./EmployeeList.css";
 
-//serene-tundra-77911.herokuapp.com/api/employees
-
 class EmployeeList extends React.Component {
   
   constructor(){
     super();
     this.state = {
-      employees : []
+      employees : [],
+      pets : []
     }
   }
 
   componentDidMount(){
-    let employees = this.getEmployees();
-    this.setState({
-      employees : employees
-    })
-    //console.log(employees);
+    this.getEmployees();
+    this.getPets();
+    //console.log(`componentDidMount: employees ${this.state.employees}`); //why is this empty?
+    //console.log(`componentDidMount: pets ${this.state.pets}`);    //why is this empty?
   }
 
-  getEmployees(){
-    return [
-      {
-      id: "z7GIN_i",
-      firstName: "Leah",
-      lastName: "Ayers",
-      prefix: "Dr.",
-      postfix: "",
-      title: "Medical Director"
-      },
-      {
-      id: "vlJtFOU",
-      firstName: "Jovanni",
-      lastName: "Hernandez",
-      prefix: "Dr.",
-      postfix: "",
-      title: "Associate Veterinarian"
-      },
-      {
-      id: "t3qV6bu",
-      firstName: "Susan",
-      lastName: "Gallegos",
-      prefix: "",
-      postfix: "CVPM",
-      title: "Practice Manager"
-      },
-      {
-      id: "B3uGgZk",
-      firstName: "Harper",
-      lastName: "Anderson",
-      prefix: "",
-      postfix: "",
-      title: "Veterinary Assistant"
-      },
-      {
-      id: "KJ30Pcw",
-      firstName: "Leandro",
-      lastName: "Barada",
-      prefix: "",
-      postfix: "",
-      title: "Client Services Coordinator"
-      }
-      ]
+  getEmployees(){    
+    fetch('https://vet-lab-8-4.herokuapp.com/api/employees')
+    .then((response) => response.json())
+    .then((json) => {
+      this.setState({
+        employees : json
+      });      
+    })
+    .catch((error) => {
+      console.log('Error fetching employees:' + error)
+    });
+  }
 
+  getPets(){
+    fetch('https://vet-lab-8-4.herokuapp.com/api/pets')
+    .then((response) => response.json())
+    .then((json) => {
+      this.setState({
+        pets : json
+      });      
+    })
+    .catch((error) => {
+      console.log('Error fetching pets:' + error)
+    });
+  }
+
+  getEmployeePets(employee){
+    return this.state.pets.filter(pet => pet.employeeId === employee.id).map(pet => pet.name).join(', '); 
   }
 
   render(){
-    //let employeeNames = this.state.employees.map(employee => employee.firstName);
-    //https://bobbyhadz.com/blog/react-pass-object-as-props#:~:text=Use%20the%20spread%20syntax%20(..,props%20to%20the%20specified%20component.
+      //https://bobbyhadz.com/blog/react-pass-object-as-props#:~:text=Use%20the%20spread%20syntax%20(..,props%20to%20the%20specified%20component.
     
-    //array of Employee compents with employ object passed in props
+    //array of Employee compents, spread employee object to props
     let employees = this.state.employees.map(employee => {
+      let employeePets = this.getEmployeePets(employee);
+      console.log(`employeePets: ${employeePets}`);
       return (
-        <Employee 
-          {... employee}        
-        />
+        <Employee {... employee} employeePets = {employeePets}/>
       )
     });
 
